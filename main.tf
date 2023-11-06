@@ -23,6 +23,10 @@
  * - [org|project|]-<role>
  * - storage:[org|project|]-<role>:<bucket>
  *
+ * ## Required Inputs
+ *
+ * organization_id or project_id MUST be specified
+ *
  */
 
 # TODO:

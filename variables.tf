@@ -7,6 +7,7 @@ variable "organization_id" {
 variable "project_id" {
   description = "Project ID."
   type        = string
+  default     = ""
 }
 
 variable "members" {

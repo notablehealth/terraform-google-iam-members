@@ -24,6 +24,10 @@ Terraform module for Google IAM memberships
 - [org|project|]-<role>
 - storage:[org|project|]-<role>:<bucket>
 
+## Required Inputs
+
+organization\_id or project\_id MUST be specified
+
 ## Usage
 
 Basic usage of this module is as follows:
@@ -36,7 +40,6 @@ module "example" {
 
     # Required variables
     members =
-    project_id =
 }
 ```
 
@@ -76,7 +79,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>    condition = optional(object({<br>      description = string<br>      expression  = string<br>      title       = string<br>    }), null)<br>  }))</pre> | n/a | yes |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | Organization ID. | `string` | `""` | no |
-| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | n/a | yes |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | `""` | no |
 
 ## Outputs
 
