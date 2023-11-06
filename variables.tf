@@ -14,5 +14,10 @@ variable "members" {
   type = list(object({
     member = string
     roles  = list(string)
+    condition = optional(object({
+      description = string
+      expression  = string
+      title       = string
+    }), null)
   }))
 }

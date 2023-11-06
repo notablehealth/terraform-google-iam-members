@@ -17,6 +17,13 @@ Terraform module for Google IAM memberships
 - BigQuery dataset roles
 - BigQuery table roles
 
+## Role formats
+
+- bigquery-dataset:[org|project|]-<role>:datasetId
+- bigquery-table:[org|project|]-<role>:datasetId:tableId
+- [org|project|]-<role>
+- storage:[org|project|]-<role>:<bucket>
+
 ## Usage
 
 Basic usage of this module is as follows:
@@ -39,12 +46,14 @@ module "example" {
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.3 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | 5.4.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.1 |
 
 ## Modules
 
@@ -59,20 +68,19 @@ No modules.
 | [google_organization_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_project_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
 | [google_storage_bucket_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
+| [null_resource.org_proj_precondition_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>    condition = optional(object({<br>      description = string<br>      expression  = string<br>      title       = string<br>    }), null)<br>  }))</pre> | n/a | yes |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | Organization ID. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | n/a | yes |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_sample_output"></a> [sample\_output](#output\_sample\_output) | output value description |
+No outputs.
 
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
