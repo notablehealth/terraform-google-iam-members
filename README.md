@@ -1,18 +1,21 @@
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-# terraform-google-module-template
+# terraform-google-iam-members
 
-[![Releases](https://img.shields.io/github/v/release/notablehealth/terraform-google-module-template)](https://github.com/notablehealth/terraform-google-module-template/releases)
+[![Releases](https://img.shields.io/github/v/release/notablehealth/terraform-google-iam-members)](https://github.com/notablehealth/terraform-google-iam-members/releases)
 
-[Terraform Module Registry](https://registry.terraform.io/modules/notablehealth/module-template/google)
+[Terraform Module Registry](https://registry.terraform.io/modules/notablehealth/iam-members/google)
 
-Template for creating a Terraform module for Google
+Terraform module for Google IAM memberships
 
-## Features
+## Supports
 
-- base terraform files
-- pre-commit setup
-- GitHub actions setup
+- Google roles
+- Project custom roles
+- Organization custom roles
+- Storage bucket roles
+- BigQuery dataset roles
+- BigQuery table roles
 
 ## Usage
 
@@ -23,6 +26,10 @@ module "example" {
     source = "notablehealth/<module-name>/google"
     # Recommend pinning every module to a specific version
     # version = "x.x.x"
+
+    # Required variables
+    members =
+    project_id =
 }
 ```
 
@@ -30,12 +37,14 @@ module "example" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3.7 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | >= 4.51.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.3 |
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_google"></a> [google](#provider\_google) | 5.4.0 |
 
 ## Modules
 
@@ -43,13 +52,21 @@ No modules.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [google_bigquery_dataset_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigquery_dataset_iam_member) | resource |
+| [google_bigquery_table_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/bigquery_table_iam_member) | resource |
+| [google_organization_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
+| [google_project_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_storage_bucket_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_sample_input"></a> [sample\_input](#input\_sample\_input) | Simple string variable | `string` | `"sample"` | no |
+| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>  }))</pre> | n/a | yes |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | Organization ID. | `string` | `""` | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | n/a | yes |
 
 ## Outputs
 

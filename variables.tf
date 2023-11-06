@@ -1,18 +1,18 @@
 
-#variable "validated" {
-#  description = "String variable with validation"
-#  type        = string
-#  validation {
-#    condition = contains(
-#      ["one", "two", "three", "four"],
-#      var.validated
-#    )
-#    error_message = "Must be one of: one, two, three, four."
-#  }
-#}
-
-variable "sample_input" {
-  description = "Simple string variable"
+variable "organization_id" {
+  description = "Organization ID."
   type        = string
-  default     = "sample"
+  default     = ""
+}
+variable "project_id" {
+  description = "Project ID."
+  type        = string
+}
+
+variable "members" {
+  description = "List of members and roles to add them to."
+  type = list(object({
+    member = string
+    roles  = list(string)
+  }))
 }
