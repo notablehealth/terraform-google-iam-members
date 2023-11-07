@@ -16,6 +16,7 @@ Terraform module for Google IAM memberships
 - Storage bucket roles
 - BigQuery dataset roles
 - BigQuery table roles
+- IAM Conditions
 
 ## Role formats
 
@@ -77,7 +78,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>    condition = optional(object({<br>      description = string<br>      expression  = string<br>      title       = string<br>    }), null)<br>  }))</pre> | n/a | yes |
+| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles  = list(string)<br>    condition = optional(object({<br>      description = string<br>      expression  = string<br>      title       = string<br>    }))<br>  }))</pre> | n/a | yes |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | Organization ID. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | `""` | no |
 

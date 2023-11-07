@@ -1,9 +1,4 @@
 
-variable "organization_id" {
-  description = "Organization ID."
-  type        = string
-  default     = ""
-}
 variable "project_id" {
   description = "Project ID."
   type        = string
