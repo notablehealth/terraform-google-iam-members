@@ -31,7 +31,6 @@
  */
 
 # TODO:
-#   conditions not working - Fix
 #   Add billing account support   billing:organization-<role>:billingAccountId
 
 resource "null_resource" "org_proj_precondition_validation" {
