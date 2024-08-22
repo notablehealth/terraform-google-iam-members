@@ -21,6 +21,7 @@
  *
  * - bigquery-dataset:[org|project|]-<role>:datasetId
  * - bigquery-table:[org|project|]-<role>:datasetId:tableId
+ * - billing:<role>
  * - [org|project|]-<role>
  * - storage:[org|project|]-<role>:<bucket>
  *
@@ -31,8 +32,16 @@
  */
 
 # TODO:
-#   Add billing account support   billing:organization-<role>:billingAccountId
+#   constraint patterns ?
+#     secret prefix
+#       expression  = "resource.name.startsWith(${format("\"%s/%s/%s/%s%s\"","projects",var.project_number,"secrets",each.value.secrets_prefix,"__")})"
+#   google_cloud_run_service_iam_member
+#   google_folder_iam_member
+#   google_secret_manager_secret_iam_member - for single secret
+#   google_service_account_iam_member - allow principal to impersonate service account
+#   more as needed
 
+# TODO: ?? update to be 1 of project, org, or billing required
 resource "null_resource" "org_proj_precondition_validation" {
   lifecycle {
     precondition {
@@ -45,7 +54,7 @@ locals {
   target_id = var.project_id != "" ? var.project_id : var.organization_id
   members = flatten([for member in var.members :
     [for role in member.roles :
-  { member = member.member, role = role, condition = member.condition }]])
+  { member = member.member, role = role.role, condition = role.condition }]])
 }
 
 # Role format: bigquery-dataset:[org|project|]-<role>:datasetId
@@ -92,7 +101,16 @@ resource "google_bigquery_table_iam_member" "self" {
     }
   }
 }
-#   Add billing account support   billing:organization-<role>:billingAccountId
+
+# Role format: billing:<role>
+resource "google_billing_account_iam_member" "self" {
+  for_each = { for member in local.members : "${member.member}-${member.role}" => member
+  if var.billing_account_name != "" && startswith(member.role, "billing:") }
+
+  billing_account_id = data.google_billing_account.self[0].id
+  member             = each.value.member
+  role               = "roles/${split(":", each.value.role)[1]}"
+}
 
 # Role format: [org|]-<role>
 resource "google_organization_iam_member" "self" {
@@ -138,6 +156,10 @@ resource "google_project_iam_member" "self" {
     }
   }
 }
+
+# TODO
+# Role format: sa:[org|project|]-<role>:<serviceAccount>
+#resource "google_service_account_iam_member" "self" {}
 
 # Role format: storage:[org|project|]-<role>:<bucket>
 resource "google_storage_bucket_iam_member" "self" {
