@@ -20,11 +20,11 @@ Terraform module for Google IAM memberships
 
 ## Role formats
 
-- bigquery-dataset:[org|project|]-<role>:datasetId
-- bigquery-table:[org|project|]-<role>:datasetId:tableId
-- billing:<role>
-- [org|project|]-<role>
-- storage:[org|project|]-<role>:<bucket>
+- bigquery-dataset:[org|project|]-role:datasetId
+- bigquery-table:[org|project|]-role:datasetId:tableId
+- billing:role
+- [org|project|]-role
+- storage:[org|project|]-role:bucket
 
 ## Required Inputs
 
