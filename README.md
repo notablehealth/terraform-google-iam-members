@@ -49,8 +49,8 @@ module "example" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.3 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.2 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | >= 5.3 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.2 |
 
 ## Providers
 
@@ -81,7 +81,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_billing_account_name"></a> [billing\_account\_name](#input\_billing\_account\_name) | Billing account name. | `string` | `""` | no |
-| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    roles = list(object({<br>      role = string<br>      condition = optional(object({<br>        description = string<br>        expression  = string<br>        title       = string<br>      }))<br>    }))<br>  }))</pre> | n/a | yes |
+| <a name="input_members"></a> [members](#input\_members) | List of members and roles to add them to. | <pre>list(object({<br>    member = string<br>    #condition = optional(object({<br>    #  description = string<br>    #  expression  = string<br>    #  title       = string<br>    #}))<br>    roles = list(object({<br>      role = string<br>      condition = optional(object({<br>        description = string<br>        expression  = string<br>        title       = string<br>      }))<br>    }))<br>  }))</pre> | n/a | yes |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | Organization ID. | `string` | `""` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Project ID. | `string` | `""` | no |
 

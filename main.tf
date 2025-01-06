@@ -55,6 +55,7 @@ locals {
   members = flatten([for member in var.members :
     [for role in member.roles :
   { member = member.member, role = role.role, condition = role.condition }]])
+  # If no role.condition
 }
 
 # Role format: bigquery-dataset:[org|project|]-<role>:datasetId
