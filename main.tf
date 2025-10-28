@@ -183,3 +183,28 @@ resource "google_storage_bucket_iam_member" "self" {
     }
   }
 }
+
+
+# Role format: cloud-run-job:[org|project|]-<role>:job-name
+resource "google_cloud_run_v2_job_iam_member" "self" {
+  for_each = {
+    for member in local.members : "${member.member}-${member.role}" => member
+    if var.project_id != "" && startswith(member.role, "cloud-run-job:")
+  }
+
+  name    = split(":", each.value.role)[2]
+  member  = each.value.member
+  project = local.target_id
+  role = startswith(split(":", each.value.role)[1], "project:") ? "projects/${var.project_id}/roles/${substr(split(":", each.value.role)[1], 8, -1)}" : (
+    startswith(split(":", each.value.role)[1], "org:") ?
+    "organizations/${var.organization_id}/roles/${substr(split(":", each.value.role)[1], 4, -1)}"
+  : "roles/${split(":", each.value.role)[1]}")
+  dynamic "condition" {
+    for_each = lookup(each.value, "condition", null) != null ? [each.value.condition] : []
+    content {
+      description = condition.value.description
+      expression  = condition.value.expression
+      title       = condition.value.title
+    }
+  }
+}
