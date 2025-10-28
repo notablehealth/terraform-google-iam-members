@@ -56,6 +56,7 @@ locals {
     [for role in member.roles :
   { member = member.member, role = role.role, condition = role.condition }]])
   # If no role.condition
+  supported_resources = ["bigquery-dataset", "bigquery-table", "storage", "cloud-run-job"]
 }
 
 # Role format: bigquery-dataset:[org|project|]-<role>:datasetId
@@ -116,7 +117,7 @@ resource "google_billing_account_iam_member" "self" {
 # Role format: [org|]-<role>
 resource "google_organization_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}" => member
-  if var.organization_id != "" && !contains(["bigquery-dataset", "bigquery-table", "storage"], element(split(":", member.role), 0)) }
+  if var.organization_id != "" && !contains(local.supported_resources, element(split(":", member.role), 0)) }
 
   org_id = local.target_id
   role = (
@@ -137,7 +138,7 @@ resource "google_organization_iam_member" "self" {
 # Role format: [org|project|]-<role>
 resource "google_project_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}" => member
-  if var.project_id != "" && !contains(["bigquery-dataset", "bigquery-table", "storage"], element(split(":", member.role), 0)) }
+  if var.project_id != "" && !contains(local.supported_resources, element(split(":", member.role), 0)) }
 
   project = local.target_id
   role = startswith(each.value.role, "project:") ? "projects/${var.project_id}/roles/${substr(each.value.role, 8, -1)}" : (
