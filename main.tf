@@ -52,10 +52,24 @@ resource "null_resource" "org_proj_precondition_validation" {
 }
 locals {
   target_id = var.project_id != "" ? var.project_id : var.organization_id
-  members = flatten([for member in var.members :
-    [for role in member.roles :
-  { member = member.member, role = role.role, condition = role.condition }]])
+  members = flatten(
+    [
+      for member in var.members :
+      [
+        for role in member.roles :
+        {
+          member = member.member,
+          role   = role.role,
+          # note lookup function doesn't work because in an object all keys
+          # are always present
+          location  = role.location == null ? var.default_location : role.location,
+          condition = role.condition
+        }
+      ]
+  ])
   # If no role.condition
+
+  # Resources outside this list get the generic google_project_iam
   supported_resources = ["bigquery-dataset", "bigquery-table", "storage", "cloud-run-job"]
 }
 
@@ -193,9 +207,10 @@ resource "google_cloud_run_v2_job_iam_member" "self" {
     if var.project_id != "" && startswith(member.role, "cloud-run-job:")
   }
 
-  name    = split(":", each.value.role)[2]
-  member  = each.value.member
-  project = local.target_id
+  name     = split(":", each.value.role)[2]
+  member   = each.value.member
+  project  = local.target_id
+  location = each.value.location
   role = startswith(split(":", each.value.role)[1], "project:") ? "projects/${var.project_id}/roles/${substr(split(":", each.value.role)[1], 8, -1)}" : (
     startswith(split(":", each.value.role)[1], "org:") ?
     "organizations/${var.organization_id}/roles/${substr(split(":", each.value.role)[1], 4, -1)}"

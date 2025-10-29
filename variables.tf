@@ -15,6 +15,12 @@ variable "project_id" {
   default     = ""
 }
 
+variable "default_location" {
+  description = "The default location"
+  type        = string
+  default     = null
+}
+
 # Allow global condition for all member roles
 #  TODO: add code to handle new data
 variable "members" {
@@ -27,7 +33,8 @@ variable "members" {
     #  title       = string
     #}))
     roles = list(object({
-      role = string
+      role     = string
+      location = optional(string)
       condition = optional(object({
         description = string
         expression  = string
