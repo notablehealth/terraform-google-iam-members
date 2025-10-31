@@ -17,6 +17,7 @@ Terraform module for Google IAM memberships
 - BigQuery dataset roles
 - BigQuery table roles
 - IAM Conditions
+- Cloud Run jobs
 
 ## Role formats
 
@@ -25,6 +26,7 @@ Terraform module for Google IAM memberships
 - billing:role
 - [org|project|]-role
 - storage:[org|project|]-role:bucket
+- cloud-run-job:[org|project|]-role:jobName
 
 ## Required Inputs
 

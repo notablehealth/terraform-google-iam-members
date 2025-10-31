@@ -52,10 +52,25 @@ resource "null_resource" "org_proj_precondition_validation" {
 }
 locals {
   target_id = var.project_id != "" ? var.project_id : var.organization_id
-  members = flatten([for member in var.members :
-    [for role in member.roles :
-  { member = member.member, role = role.role, condition = role.condition }]])
+  members = flatten(
+    [
+      for member in var.members :
+      [
+        for role in member.roles :
+        {
+          member = member.member,
+          role   = role.role,
+          # note lookup function doesn't work because in an object all keys
+          # are always present
+          location  = role.location == null ? var.default_location : role.location,
+          condition = role.condition
+        }
+      ]
+  ])
   # If no role.condition
+
+  # Resources outside this list get the generic google_project_iam
+  supported_resources = ["bigquery-dataset", "bigquery-table", "storage", "cloud-run-job"]
 }
 
 # Role format: bigquery-dataset:[org|project|]-<role>:datasetId
@@ -116,7 +131,7 @@ resource "google_billing_account_iam_member" "self" {
 # Role format: [org|]-<role>
 resource "google_organization_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}" => member
-  if var.organization_id != "" && !contains(["bigquery-dataset", "bigquery-table", "storage"], element(split(":", member.role), 0)) }
+  if var.organization_id != "" && !contains(local.supported_resources, element(split(":", member.role), 0)) }
 
   org_id = local.target_id
   role = (
@@ -137,7 +152,7 @@ resource "google_organization_iam_member" "self" {
 # Role format: [org|project|]-<role>
 resource "google_project_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}" => member
-  if var.project_id != "" && !contains(["bigquery-dataset", "bigquery-table", "storage"], element(split(":", member.role), 0)) }
+  if var.project_id != "" && !contains(local.supported_resources, element(split(":", member.role), 0)) }
 
   project = local.target_id
   role = startswith(each.value.role, "project:") ? "projects/${var.project_id}/roles/${substr(each.value.role, 8, -1)}" : (
@@ -174,6 +189,32 @@ resource "google_storage_bucket_iam_member" "self" {
     startswith(each.value.role, "storage:org-") ?
     "organizations/${var.organization_id}/roles/${one(flatten(regexall("[^:]+:([^:]+):", each.value.role)))}"
   : "roles/${one(flatten(regexall("[^:]+:([^:]+):", each.value.role)))}")
+  dynamic "condition" {
+    for_each = lookup(each.value, "condition", null) != null ? [each.value.condition] : []
+    content {
+      description = condition.value.description
+      expression  = condition.value.expression
+      title       = condition.value.title
+    }
+  }
+}
+
+
+# Role format: cloud-run-job:[org|project|]-<role>:job-name
+resource "google_cloud_run_v2_job_iam_member" "self" {
+  for_each = {
+    for member in local.members : "${member.member}-${member.role}" => member
+    if var.project_id != "" && startswith(member.role, "cloud-run-job:")
+  }
+
+  name     = split(":", each.value.role)[2]
+  member   = each.value.member
+  project  = local.target_id
+  location = each.value.location
+  role = startswith(split(":", each.value.role)[1], "project:") ? "projects/${var.project_id}/roles/${substr(split(":", each.value.role)[1], 8, -1)}" : (
+    startswith(split(":", each.value.role)[1], "org:") ?
+    "organizations/${var.organization_id}/roles/${substr(split(":", each.value.role)[1], 4, -1)}"
+  : "roles/${split(":", each.value.role)[1]}")
   dynamic "condition" {
     for_each = lookup(each.value, "condition", null) != null ? [each.value.condition] : []
     content {
