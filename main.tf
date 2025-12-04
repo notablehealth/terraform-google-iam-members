@@ -79,7 +79,7 @@ resource "google_bigquery_dataset_iam_member" "self" {
   if var.project_id != "" && startswith(member.role, "bigquery-dataset:") }
 
   dataset_id = split(":", each.value.role)[2]
-  member     = each.value.member
+  member     = startswith(each.value.member, "principal") ? "iamMember:${each.value.member}" : each.value.member
   project    = local.target_id
   role = startswith(split(":", each.value.role)[1], "project:") ? "projects/${var.project_id}/roles/${substr(split(":", each.value.role)[1], 8, -1)}" : (
     startswith(split(":", each.value.role)[1], "org:") ?
