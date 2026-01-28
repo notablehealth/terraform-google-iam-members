@@ -68,16 +68,6 @@
 #   google_folder_iam_member
 #   more as needed
 
-
-# TODO: ?? update to be 1 of project, org, or billing required
-resource "null_resource" "org_proj_precondition_validation" {
-  lifecycle {
-    precondition {
-      condition     = (var.project_id != "" && var.organization_id == "") || (var.project_id == "" && var.organization_id != "")
-      error_message = "Only organization_id or project_id can be specified and one must be specified."
-    }
-  }
-}
 locals {
   target_id = var.project_id != "" ? var.project_id : var.organization_id
   members = flatten(
@@ -107,7 +97,7 @@ locals {
 
 resource "google_bigquery_dataset_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-  if var.project_id != "" && startswith(member.resource, "bigquery-dataset:") }
+  if local.target_id == var.project_id && startswith(member.resource, "bigquery-dataset:") }
 
   project = local.target_id
   role    = each.value.role
@@ -127,7 +117,7 @@ resource "google_bigquery_dataset_iam_member" "self" {
 
 resource "google_bigquery_table_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-  if var.project_id != "" && startswith(member.resource, "bigquery-table:") }
+  if local.target_id == var.project_id && startswith(member.resource, "bigquery-table:") }
 
   project = local.target_id
   role    = each.value.role
@@ -157,7 +147,7 @@ resource "google_billing_account_iam_member" "self" {
 
 resource "google_organization_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-  if var.organization_id != "" && member.resource == "base" }
+  if local.target_id == var.organization_id && member.resource == "base" }
 
   org_id = local.target_id
   role   = each.value.role
@@ -175,7 +165,7 @@ resource "google_organization_iam_member" "self" {
 
 resource "google_project_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-  if var.project_id != "" && member.resource == "base" }
+  if local.target_id == var.project_id && member.resource == "base" }
 
   project = local.target_id
   role    = each.value.role
@@ -193,7 +183,7 @@ resource "google_project_iam_member" "self" {
 
 resource "google_storage_bucket_iam_member" "self" {
   for_each = { for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-  if var.project_id != "" && startswith(member.resource, "storage:") }
+  if local.target_id == var.project_id && startswith(member.resource, "storage:") }
 
   role   = each.value.role
   member = each.value.member
@@ -213,7 +203,7 @@ resource "google_storage_bucket_iam_member" "self" {
 resource "google_cloud_run_v2_job_iam_member" "self" {
   for_each = {
     for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-    if var.project_id != "" && startswith(member.resource, "cloud-run-job:")
+    if local.target_id == var.project_id && startswith(member.resource, "cloud-run-job:")
   }
 
   project  = local.target_id
@@ -236,7 +226,7 @@ resource "google_cloud_run_v2_job_iam_member" "self" {
 resource "google_secret_manager_secret_iam_member" "self" {
   for_each = {
     for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-    if var.project_id != "" && startswith(member.resource, "secret:")
+    if local.target_id == var.project_id && startswith(member.resource, "secret:")
   }
 
   project = local.target_id
@@ -258,7 +248,7 @@ resource "google_secret_manager_secret_iam_member" "self" {
 resource "google_service_account_iam_member" "self" {
   for_each = {
     for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-    if var.project_id != "" && startswith(member.resource, "service-account:")
+    if local.target_id == var.project_id && startswith(member.resource, "service-account:")
   }
 
   role   = each.value.role
@@ -279,7 +269,7 @@ resource "google_service_account_iam_member" "self" {
 resource "google_artifact_registry_repository_iam_member" "self" {
   for_each = {
     for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
-    if var.project_id != "" && startswith(member.resource, "artifact-registry:")
+    if local.target_id == var.project_id && startswith(member.resource, "artifact-registry:")
   }
 
   project  = local.target_id
