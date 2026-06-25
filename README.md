@@ -24,6 +24,7 @@ Resource bindings to:
 - Secrets
 - Service Accounts
 - Artifact Registry Repositories
+- PubSub Topics
 
 ## Role formats
 
@@ -54,6 +55,7 @@ An identifier for the resource the binding is made too. Usually a name/single ID
 | gcsm secrets | secret | secret name
 | service accounts | service-account | service account name
 | artifact registry repository | artifact-registry | repository name
+| pubsub topic | ps-topic | topic name
 
 ## Required Inputs
 
@@ -101,6 +103,7 @@ No modules.
 | [google_cloud_run_v2_job_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_v2_job_iam_member) | resource |
 | [google_organization_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/organization_iam_member) | resource |
 | [google_project_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_pubsub_topic_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/pubsub_topic_iam_member) | resource |
 | [google_secret_manager_secret_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_iam_member) | resource |
 | [google_service_account_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
 | [google_storage_bucket_iam_member.self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/storage_bucket_iam_member) | resource |
