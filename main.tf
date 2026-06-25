@@ -23,6 +23,7 @@
  * - Secrets
  * - Service Accounts
  * - Artifact Registry Repositories
+ * - PubSub Topics
  *
  * ## Role formats
  *
@@ -53,6 +54,7 @@
  * | gcsm secrets | secret | secret name
  * | service accounts | service-account | service account name
  * | artifact registry repository | artifact-registry | repository name
+ * | pubsub topic | ps-topic | topic name
  *
  * ## Required Inputs
  *
@@ -278,6 +280,28 @@ resource "google_artifact_registry_repository_iam_member" "self" {
   member   = each.value.member
 
   repository = split(":", each.value.resource)[1]
+
+  dynamic "condition" {
+    for_each = lookup(each.value, "condition", null) != null ? [each.value.condition] : []
+    content {
+      description = condition.value.description
+      expression  = condition.value.expression
+      title       = condition.value.title
+    }
+  }
+}
+
+resource "google_pubsub_topic_iam_member" "self" {
+  for_each = {
+    for member in local.members : "${member.member}-${member.role}-${member.resource}" => member
+    if local.target_id == var.project_id && startswith(member.resource, "ps-topic:")
+  }
+
+  project = local.target_id
+  role    = each.value.role
+  member  = each.value.member
+
+  topic = split(":", each.value.resource)[1]
 
   dynamic "condition" {
     for_each = lookup(each.value, "condition", null) != null ? [each.value.condition] : []
